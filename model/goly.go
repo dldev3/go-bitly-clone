@@ -22,7 +22,7 @@ func GetGoly(id uint64) (Goly, error) {
 	return goly, nil
 }
 
-func CreateGol(goly Goly) error {
+func CreateGoly(goly Goly) error {
 	tx := db.Create(&goly)
 
 	return tx.Error
