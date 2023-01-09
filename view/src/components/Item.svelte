@@ -4,6 +4,7 @@
     import { Modals, closeModal, openModal } from "svelte-modals";
 
     export let goly;
+    let isShow = true;
 
     async function update(data) {
         const json = {
@@ -40,22 +41,25 @@
                     ") ?"
             )
         ) {
-            await fetch("http://localhost:3000/goly/" + id, {
+            await fetch("http://localhost:3000/goly/" + goly.id, {
                 method: "DELETE",
             }).then((response) => {
+                ifShow = false;
                 console.log(response);
             });
         }
     }
 </script>
 
-<Card>
-    <p>Goly: http://localhost:3000/r/{goly.goly}</p>
-    <p>Redirect: {goly.redirect}</p>
-    <p>Clicled: {goly.clicked}</p>
-    <button class="update" on:click={handleOpen(goly)}>Update</button>
-    <button class="delete" on:click={deleteGoly}>Delete</button>
-</Card>
+{#if isShow}
+    <Card>
+        <p>Goly: http://localhost:3000/r/{goly.goly}</p>
+        <p>Redirect: {goly.redirect}</p>
+        <p>Clicled: {goly.clicked}</p>
+        <button class="update" on:click={handleOpen(goly)}>Update</button>
+        <button class="delete" on:click={deleteGoly}>Delete</button>
+    </Card>
+{/if}
 <Modals>
     <div slot="backdrop" class="backdrop" on:click={closeModal} />
 </Modals>
