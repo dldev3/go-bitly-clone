@@ -85,6 +85,26 @@ func updateGoly(c *fiber.Ctx) error {
 
 }
 
+func deleteGoly(c *fiber.Ctx) error {
+	id, err := strconv.ParseUint(c.Params("id"), 10, 64)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"message": "could not parse id from url" + err.Error(),
+		})
+	}
+
+	err = model.DeleteGoly(id)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"message": "could not delete from DB" + err.Error(),
+		})
+	}
+
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"message": "Goly deleted",
+	})
+}
+
 func SetupAndListen() {
 	router := fiber.New()
 
@@ -97,6 +117,7 @@ func SetupAndListen() {
 	router.Get("/goly/:id", getGoly)
 	router.Post("/goly", createGoly)
 	router.Patch("/goly", updateGoly)
+	router.Delete("/goly/:id", deleteGoly)
 
 	router.Listen(":3000")
 }
