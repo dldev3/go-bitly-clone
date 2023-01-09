@@ -3,11 +3,34 @@ package server
 import (
 	"bitly-clone/model"
 	"bitly-clone/utils"
+	"fmt"
 	"strconv"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 )
+
+func redirect(c *fiber.Ctx) error {
+	golyUrl := c.Params("redirect")
+	goly, err := model.FindByGolyUrl(golyUrl)
+
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"message": "could not find goly in DB" + err.Error(),
+		})
+	}
+
+	//put any stats here
+
+	goly.Clicked += 1
+	err = model.UpdateGoly(goly)
+
+	if err != nil {
+		fmt.Printf("error updating: %v\n", err)
+	}
+
+	return c.Redirect(goly.Redirect, fiber.StatusTemporaryRedirect)
+}
 
 func getAllGolies(ctx *fiber.Ctx) error {
 	golies, err := model.GetAllGolies()
@@ -112,6 +135,8 @@ func SetupAndListen() {
 		AllowOrigins: "*",
 		AllowHeaders: "Origin, Content-Type, Accept",
 	}))
+
+	router.Get("/r/:redirect", redirect)
 
 	router.Get("/goly", getAllGolies)
 	router.Get("/goly/:id", getGoly)
