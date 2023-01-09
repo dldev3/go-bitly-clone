@@ -1,4 +1,5 @@
 <script>
+    import Modal from "./Modal.svelte";
     import Card from "./Card.svelte";
     import { Modals, closeModal, openModal } from "svelte-modals";
 
@@ -10,7 +11,7 @@
             goly: data.goly,
             random: data.random,
             id: goly.id,
-        }
+        };
 
         await fetch("http://localhost:3000/goly", {
             method: "PATCH",
@@ -18,7 +19,7 @@
             body: JSON.stringify(json),
         }).then((res) => {
             console.log(res);
-        })
+        });
     }
 
     function handleOpen(goly) {
@@ -30,6 +31,22 @@
             random: goly.random,
         });
     }
+
+    async function deleteGoly() {
+        if (
+            confirm(
+                "Are you sure you wish to delete this Goly link (" +
+                    goly.goly +
+                    ") ?"
+            )
+        ) {
+            await fetch("http://localhost:3000/goly/" + id, {
+                method: "DELETE",
+            }).then((response) => {
+                console.log(response);
+            });
+        }
+    }
 </script>
 
 <Card>
@@ -37,7 +54,7 @@
     <p>Redirect: {goly.redirect}</p>
     <p>Clicled: {goly.clicked}</p>
     <button class="update" on:click={handleOpen(goly)}>Update</button>
-    <button class="delete">Delete</button>
+    <button class="delete" on:click={deleteGoly}>Delete</button>
 </Card>
 <Modals>
     <div slot="backdrop" class="backdrop" on:click={closeModal} />
